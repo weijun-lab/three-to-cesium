@@ -4,7 +4,7 @@
 - - -
 A plugin that enables Cesium and Three.js to run in synchronization.
 ---
-![](./example/assets/code2.gif)
+![](./example/assets/code3.gif)
 ## 🎨Live Demo
 <https://weijun-lab.github.io/three-to-cesium/>
 ## Installation
@@ -53,7 +53,31 @@ cesiumViewer.scene.postRender.addEventListener(() => {
 ```
 ![](./example/assets/code1.png)
 
+
 ### Example2
+```js
+let cesiumViewer = new Cesium.Viewer('map', {
+    sceneModePicker: false,
+});
+let localPositions = ThreeToCesium.localizePositions([
+  Cesium.Cartesian3.fromDegrees(108.95993690885348, 34.28688948263291, 0),
+  Cesium.Cartesian3.fromDegrees(108.95836123161854, 34.28461622000204, 0),
+  Cesium.Cartesian3.fromDegrees(108.96052860333033, 34.28463093923793, 0),
+  Cesium.Cartesian3.fromDegrees(108.95894270765785, 34.286895032131916, 0),
+]);
+let sceneIntegrator = ThreeToCesium(cesiumViewer);
+let geometry = new THREE.BufferGeometry().setFromPoints(localPositions.positions);
+let material = new THREE.LineBasicMaterial({
+  color: 0xff0000,
+});
+let line = new THREE.Line(geometry, material);
+sceneIntegrator.add(line, localPositions.centerInWorld);
+cesiumViewer.scene.postRender.addEventListener(() => {
+  sceneIntegrator.update();
+});
+```
+![](./example/assets/code2.png)
+### Example3
 ```js
 let cesiumViewer = new Cesium.Viewer('map', {
     sceneModePicker: false,
@@ -105,7 +129,7 @@ cesiumViewer.scene.postRender.addEventListener(() => {
     sceneIntegrator.update();
 });
 ```
-![](./example/assets/code2.gif)
+![](./example/assets/code3.gif)
 ## Params
 ```js
 ThreeToCesium(cesiumViewer,options);
@@ -127,6 +151,7 @@ ThreeToCesium(cesiumViewer,options);
 | remove(`<THREE.Object3D>` object) | - | Remove the specified Three.js 3D object. |
 | update() | - | Synchronize the Three.js and Cesium cameras, and execute THREE.WebGLRenderer.render(). |
 | destroy() | - | Destroy the Three.js scene. |
+| **static** localizePositions(`Array.<Cesium.Cartesian3>` array) | {positions,centerInWorld} | Translate the incoming global Cartesian3 coordinates to local coordinates with the center point as the origin. The returned object has a `positions` property containing the array of local coordinates and a `centerInWorld` property representing the origin of the local coordinate system. see [Example2](#example2). |
 ## Properties
 | Properties | Type | Description |
 | --- | --- | --- |

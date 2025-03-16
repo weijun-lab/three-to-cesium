@@ -1,102 +1,84 @@
-var C = (i) => {
-  throw TypeError(i);
+var v = (r) => {
+  throw TypeError(r);
 };
-var c = (i, e, t) => e.has(i) || C("Cannot " + t);
-var d = (i, e, t) => (c(i, e, "read from private field"), t ? t.call(i) : e.get(i)), l = (i, e, t) => e.has(i) ? C("Cannot add the same private member more than once") : e instanceof WeakSet ? e.add(i) : e.set(i, t), u = (i, e, t, r) => (c(i, e, "write to private field"), r ? r.call(i, t) : e.set(i, t), t), p = (i, e, t) => (c(i, e, "access private method"), t);
+var R = (r, e, t) => e.has(r) || v("Cannot " + t);
+var c = (r, e, t) => (R(r, e, "read from private field"), t ? t.call(r) : e.get(r)), w = (r, e, t) => e.has(r) ? v("Cannot add the same private member more than once") : e instanceof WeakSet ? e.add(r) : e.set(r, t), f = (r, e, t, i) => (R(r, e, "write to private field"), i ? i.call(r, t) : e.set(r, t), t), u = (r, e, t) => (R(r, e, "access private method"), t);
 import * as h from "three";
-import * as f from "cesium";
-var n, o, m, w, R;
-class v {
+import * as s from "cesium";
+var n, l, m, V, g;
+class T {
   constructor(e, t = {}) {
-    l(this, m);
-    l(this, n);
-    l(this, o);
-    var r, s;
-    this.cesiumViewer = e, u(this, n, {
-      cameraNear: (r = t.cameraNear) != null ? r : 0.1,
-      cameraFar: (s = t.cameraFar) != null ? s : 1e4
-    }), p(this, m, w).call(this);
+    w(this, m);
+    w(this, n, {});
+    w(this, l, !1);
+    var i, a;
+    this.cesiumViewer = e, f(this, n, {
+      cameraNear: (i = t.cameraNear) != null ? i : 0.1,
+      cameraFar: (a = t.cameraFar) != null ? a : 1e4
+    }), u(this, m, V).call(this);
   }
   add(e, t) {
-    let r = f.Transforms.eastNorthUpToFixedFrame(t), s = new h.Matrix4();
-    s.set(
-      r[0],
-      r[4],
-      r[8],
-      r[12],
-      r[1],
-      r[5],
-      r[9],
-      r[13],
-      r[2],
-      r[6],
-      r[10],
-      r[14],
-      0,
-      0,
-      0,
-      1
-    ), s.multiply(new h.Matrix4().makeRotationX(Math.PI / 2));
-    let a = new h.Group();
-    return this.threeScene.add(a), a.add(e), a.applyMatrix4(s), a;
+    let i = new h.Group();
+    if (this.threeScene.add(i), i.add(e), t) {
+      let a = s.Transforms.eastNorthUpToFixedFrame(t), o = this.convertColumnToRowMajor(a);
+      i.applyMatrix4(new h.Matrix4().set(...o));
+    }
+    return i;
+  }
+  static localizePositions(e) {
+    let t = s.Rectangle.fromCartesianArray(e), i = s.Rectangle.center(t), a = s.Cartographic.toCartesian(i), o = s.Transforms.eastNorthUpToFixedFrame(a), d = s.Matrix4.inverse(o, new s.Matrix4());
+    return {
+      positions: e.map((p) => {
+        let x = s.Matrix4.multiplyByPoint(d, p, new s.Cartesian3());
+        return new h.Vector3(x.x, x.y, x.z);
+      }),
+      centerInWorld: a
+    };
+  }
+  convertColumnToRowMajor(e) {
+    return [
+      e[0],
+      e[4],
+      e[8],
+      e[12],
+      e[1],
+      e[5],
+      e[9],
+      e[13],
+      e[2],
+      e[6],
+      e[10],
+      e[14],
+      e[3],
+      e[7],
+      e[11],
+      e[15]
+    ];
   }
   remove(e) {
     this.threeScene.remove(e.parent), this.threeScene.remove(e);
   }
   update() {
-    d(this, o) || (p(this, m, R).call(this), this.threeRenderer.render(this.threeScene, this.threeCamera));
+    c(this, l) || (u(this, m, g).call(this), this.threeRenderer.render(this.threeScene, this.threeCamera));
   }
   destroy() {
-    u(this, o, !0), this.threeRenderer.dispose(), this.cesiumViewer.container.removeChild(this.threeRenderer.domElement);
+    f(this, l, !0), this.threeRenderer.dispose(), this.cesiumViewer.container.removeChild(this.threeRenderer.domElement);
   }
 }
-n = new WeakMap(), o = new WeakMap(), m = new WeakSet(), w = function() {
-  let e = this.cesiumViewer.container, t = e.offsetWidth, r = e.offsetHeight;
-  this.threeScene = new h.Scene(), this.threeCamera = new h.PerspectiveCamera(void 0, t / r, d(this, n).cameraNear, d(this, n).cameraFar), this.threeRenderer = new h.WebGLRenderer({ alpha: !0 }), this.threeRenderer.setClearColor(0, 0), this.threeRenderer.domElement.style.position = "absolute", this.threeRenderer.domElement.style.top = "0", this.threeRenderer.domElement.style.width = "100%", this.threeRenderer.domElement.style.height = "100%", this.threeRenderer.domElement.style.pointerEvents = "none", e.appendChild(this.threeRenderer.domElement);
-}, R = function() {
-  this.threeCamera.matrixAutoUpdate = !1, this.threeCamera.fov = f.Math.toDegrees(this.cesiumViewer.camera.frustum.fovy);
-  let e = this.cesiumViewer.camera.viewMatrix, t = this.cesiumViewer.camera.inverseViewMatrix;
-  this.threeCamera.matrixWorld.set(
-    t[0],
-    t[4],
-    t[8],
-    t[12],
-    t[1],
-    t[5],
-    t[9],
-    t[13],
-    t[2],
-    t[6],
-    t[10],
-    t[14],
-    t[3],
-    t[7],
-    t[11],
-    t[15]
-  ), this.threeCamera.matrixWorldInverse.set(
-    e[0],
-    e[4],
-    e[8],
-    e[12],
-    e[1],
-    e[5],
-    e[9],
-    e[13],
-    e[2],
-    e[6],
-    e[10],
-    e[14],
-    e[3],
-    e[7],
-    e[11],
-    e[15]
-  );
-  let r = this.cesiumViewer.container, s = r.offsetWidth, a = r.offsetHeight, x = s / a;
-  this.threeCamera.aspect = x, this.threeCamera.updateProjectionMatrix(), this.threeRenderer.setSize(s, a);
+n = new WeakMap(), l = new WeakMap(), m = new WeakSet(), V = function() {
+  let e = this.cesiumViewer.container, t = e.offsetWidth, i = e.offsetHeight;
+  this.threeScene = new h.Scene(), this.threeCamera = new h.PerspectiveCamera(void 0, t / i, c(this, n).cameraNear, c(this, n).cameraFar), this.threeRenderer = new h.WebGLRenderer({ alpha: !0 }), this.threeRenderer.setClearColor(0, 0), this.threeRenderer.domElement.style.position = "absolute", this.threeRenderer.domElement.style.top = "0", this.threeRenderer.domElement.style.width = "100%", this.threeRenderer.domElement.style.height = "100%", this.threeRenderer.domElement.style.pointerEvents = "none", e.appendChild(this.threeRenderer.domElement);
+}, g = function() {
+  this.threeCamera.matrixAutoUpdate = !1, this.threeCamera.fov = s.Math.toDegrees(this.cesiumViewer.camera.frustum.fovy);
+  let e = this.cesiumViewer.camera.viewMatrix, t = this.cesiumViewer.camera.inverseViewMatrix, i = this.convertColumnToRowMajor(e), a = this.convertColumnToRowMajor(t);
+  this.threeCamera.matrixWorld.set(...a), this.threeCamera.matrixWorldInverse.set(...i);
+  let o = this.cesiumViewer.container, d = o.offsetWidth, C = o.offsetHeight, p = d / C;
+  this.threeCamera.aspect = p, this.threeCamera.updateProjectionMatrix(), this.threeRenderer.setSize(d, C);
 };
-function E(...i) {
-  return new v(...i);
+function E(...r) {
+  return new T(...r);
 }
+E.localizePositions = T.localizePositions;
 export {
   E as default
 };

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./lib/Cesium/Widgets/widgets.css">
+  <style>
+    html,
+    body,
+    #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+</body>
+<script src="./lib/Cesium/Cesium.js"></script>
+<script src="./lib/three/build/three.js"></script>
+<script src="./lib/three-to-cesium.umd.cjs"></script>
+<script>
+  Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzOTUwYzYxZS0xNmQzLTRjYzQtYTE5NC1iMzNkNmZmNDJjODMiLCJpZCI6MzUwMjQsImlhdCI6MTYwMTI1NjYyNH0.qtYYRNJyDZB9yOcJG-e8UCwp2CeSMwYNMHDsbsebX9Y";
+  let cesiumViewer = new Cesium.Viewer('map', {
+    sceneModePicker: false,
+  });
+  cesiumViewer.camera.setView({
+    destination: {
+      "x": -1714206.1539180523,
+      "y": 4989860.883428044,
+      "z": 3572500.1529460493
+    },
+    orientation: {
+      heading: 6.2812481058513825,
+      pitch: -0.7356471245375866,
+      roll: 0,
+    },
+  });
+
+  let sceneIntegrator = ThreeToCesium(cesiumViewer);
+  let localPositions = ThreeToCesium.localizePositions([
+    Cesium.Cartesian3.fromDegrees(108.95993690885348, 34.28688948263291, 0),
+    Cesium.Cartesian3.fromDegrees(108.95836123161854, 34.28461622000204, 0),
+    Cesium.Cartesian3.fromDegrees(108.96052860333033, 34.28463093923793, 0),
+    Cesium.Cartesian3.fromDegrees(108.95894270765785, 34.286895032131916, 0),
+  ]);
+  let geometry = new THREE.BufferGeometry().setFromPoints(localPositions.positions);
+  let material = new THREE.LineBasicMaterial({
+    color: 0xff0000,
+  });
+  let line = new THREE.Line(geometry, material);
+  sceneIntegrator.add(line, localPositions.centerInWorld);
+  cesiumViewer.scene.postRender.addEventListener(() => {
+    sceneIntegrator.update();
+  });
+
+</script>
+
+</html>

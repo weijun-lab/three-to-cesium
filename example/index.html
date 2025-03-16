@@ -73,7 +73,7 @@
   spotLight.castShadow = true;
   plane.receiveShadow = true;
   sphere.castShadow = true;
-
+  group.rotation.x = 0.5 * Math.PI;
   let step = 0;
   let clock = new THREE.Clock();
   cesiumViewer.scene.postRender.addEventListener(() => {

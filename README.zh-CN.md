@@ -4,7 +4,7 @@
 - - -
 一个使Cesium和Three.js同步运行的插件。
 ---
-![](./example/assets/code2.gif)
+![](./example/assets/code3.gif)
 ## 🎨在线示例
 <https://weijun-lab.github.io/three-to-cesium/>
 ## 安装
@@ -58,6 +58,29 @@ cesiumViewer.scene.postRender.addEventListener(() => {
 let cesiumViewer = new Cesium.Viewer('map', {
     sceneModePicker: false,
 });
+let localPositions = ThreeToCesium.localizePositions([
+  Cesium.Cartesian3.fromDegrees(108.95993690885348, 34.28688948263291, 0),
+  Cesium.Cartesian3.fromDegrees(108.95836123161854, 34.28461622000204, 0),
+  Cesium.Cartesian3.fromDegrees(108.96052860333033, 34.28463093923793, 0),
+  Cesium.Cartesian3.fromDegrees(108.95894270765785, 34.286895032131916, 0),
+]);
+let sceneIntegrator = ThreeToCesium(cesiumViewer);
+let geometry = new THREE.BufferGeometry().setFromPoints(localPositions.positions);
+let material = new THREE.LineBasicMaterial({
+  color: 0xff0000,
+});
+let line = new THREE.Line(geometry, material);
+sceneIntegrator.add(line, localPositions.centerInWorld);
+cesiumViewer.scene.postRender.addEventListener(() => {
+  sceneIntegrator.update();
+});
+```
+![](./example/assets/code2.png)
+### 示例3
+```js
+let cesiumViewer = new Cesium.Viewer('map', {
+    sceneModePicker: false,
+});
 let sceneIntegrator = ThreeToCesium(cesiumViewer);
 let position = Cesium.Cartesian3.fromDegrees(108.95943284886424, 34.288286155753546, 0.1);
 let group = new THREE.Group();
@@ -105,7 +128,7 @@ cesiumViewer.scene.postRender.addEventListener(() => {
     sceneIntegrator.update();
 });
 ```
-![](./example/assets/code2.gif)
+![](./example/assets/code3.gif)
 ## 参数
 ```js
 ThreeToCesium(cesiumViewer,option);
@@ -127,6 +150,7 @@ ThreeToCesium(cesiumViewer,option);
 | remove(`<THREE.Object3D>` object) | - | 移除指定的Three.js3d对象。 |
 | update() | - | 同步Three.js和Cesium的相机并调用THREE.WebGLRenderer.render()方法 |
 | destroy() | - | 销毁Three.js的场景并移除对应的dom节点。 |
+| **static** localizePositions(`Array.<Cesium.Cartesian3>` array) | {positions,centerInWorld} | 将传入的全局Cartesian3坐标转为以其中心点为原点的局部坐标，返回值`positions`属性为局部坐标数组，`centerInWorld`属性为局部坐标系原点。用法见[示例2](#示例2) |
 ## 属性
 | 属性名 | 类型 | 描述 |
 | --- | --- | --- |
